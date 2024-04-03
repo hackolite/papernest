@@ -67,8 +67,7 @@ def calculate_distance_h(longitude, latitude, lon, lat):
 def calculate_distance(point):
     return point.distance(reference_point)
 
-
-async def retrieve_coverage(body):  # noqa: E501
+def retrieve_coverage(body):  # noqa: E501
     """Request for network Coverage
 
     Retrieve Network Coverage for a list of adresses by Operators # noqa: E501
@@ -86,12 +85,11 @@ async def retrieve_coverage(body):  # noqa: E501
     geo_json = ast.literal_eval(geo_json)
 
     coverage_response = {}
-    async with aiohttp.ClientSession() as session:
-      for key, address in geo_json.items():
-        print(f"ID: {key}, Address: {address}")
-        async with session.get('https://api-adresse.data.gouv.fr/search/', params={'q': address}) as resp:
+    for key, address in geo_json.items():
+            print(f"ID: {key}, Address: {address}")
+            resp = requests.get('https://api-adresse.data.gouv.fr/search/', timeout=2, params={'q': address})
             resp.raise_for_status()
-            resp = await resp.json()
+            resp = resp.json()
             coordinates = resp["features"][0]["geometry"]["coordinates"]
             # Assuming gdf is your GeoDataFrame containing points data
             # 1. Define the center point and radius of the circular area
