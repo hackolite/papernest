@@ -1,0 +1,84 @@
+openapi: 3.0.3
+info:
+  title: Network Coverage - OpenAPI 3.0
+  description: 'This is a server for network coverage  given an adress list '
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: loic.laureote@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+- url: https://mycompany.com/api/v3
+tags:
+- name: network
+  description: network coverage
+  externalDocs:
+    description: Access Network Coverage
+    url: http://swagger.io
+paths:
+  /network:
+    post:
+      tags:
+      - Network
+      summary: Request for network Coverage
+      description: Retrieve Network Coverage for a list of adresses by Operators
+      operationId: retrieve_coverage
+      requestBody:
+        description: CoverageByIds
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Network'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Network'
+        required: true
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NetworkCoverageResponse'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "422":
+          description: Unprocessable Entity
+        "503":
+          description: Service Unavalaible
+      x-openapi-router-controller: swagger_server.controllers.network_controller
+components:
+  schemas:
+    Network:
+      type: object
+      additionalProperties:
+        type: string
+    NetworkCoverageResponse:
+      type: object
+      additionalProperties:
+        type: object
+        additionalProperties:
+          required:
+          - 2G
+          - 3G
+          - 4G
+          type: object
+          properties:
+            "2G":
+              type: boolean
+            "3G":
+              type: boolean
+            "4G":
+              type: boolean
+          example:
+            "4G": true
+            "3G": true
+            "2G": true
+
