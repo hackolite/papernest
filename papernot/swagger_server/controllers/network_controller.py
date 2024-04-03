@@ -1,3 +1,6 @@
+import asyncio
+import json
+import aiohttp
 import connexion
 import six
 import pandas as pd
@@ -65,7 +68,7 @@ def calculate_distance(point):
     return point.distance(reference_point)
 
 
-def retrieve_coverage(body):  # noqa: E501
+async def retrieve_coverage(body):  # noqa: E501
     """Request for network Coverage
 
     Retrieve Network Coverage for a list of adresses by Operators # noqa: E501
@@ -83,24 +86,23 @@ def retrieve_coverage(body):  # noqa: E501
     geo_json = ast.literal_eval(geo_json)
 
     coverage_response = {}
-
-    for key, address in geo_json.items():
+    async with aiohttp.ClientSession() as session:
+      for key, address in geo_json.items():
         print(f"ID: {key}, Address: {address}")
-        resp = requests.get('https://api-adresse.data.gouv.fr/search/', params={'q': address})
-        resp.raise_for_status()
-        resp = resp.json()
-        coordinates = resp["features"][0]["geometry"]["coordinates"]
-        # Assuming gdf is your GeoDataFrame containing points data
-        # 1. Define the center point and radius of the circular area
-        center_point = Point(coordinates[0], coordinates[1])  # Center point of the circle
-        # Define the buffer distance in kilometers
-        buffer_distance_km = 30  # Buffer distance in kilometers
-        # Convert the buffer distance from kilometers to degrees
-        buffer_distance_degrees = buffer_distance_km / 111 
-        filtered_entries = gdf[gdf['geometry'].buffer(buffer_distance_degrees).contains(center_point)]
-        # Add a new column 'distance_to_reference_point' to the GeoDataFrame
-        filtered_entries['distance_to_reference_point'] = filtered_entries.apply(lambda row: calculate_distance_h(coordinates[0], coordinates[1], float(row['lon']), float(row['lat'])), axis=1)
-        print(filtered_entries.info())
-        coverage_response[key] = check(filtered_entries) 
+        async with session.get('https://api-adresse.data.gouv.fr/search/', params={'q': address}) as resp:
+            resp.raise_for_status()
+            resp = await resp.json()
+            coordinates = resp["features"][0]["geometry"]["coordinates"]
+            # Assuming gdf is your GeoDataFrame containing points data
+            # 1. Define the center point and radius of the circular area
+            center_point = Point(coordinates[0], coordinates[1])  # Center point of the circle
+            # Define the buffer distance in kilometers
+            buffer_distance_km = 30  # Buffer distance in kilometers
+            # Convert the buffer distance from kilometers to degrees
+            buffer_distance_degrees = buffer_distance_km / 111 
+            filtered_entries = gdf[gdf['geometry'].buffer(buffer_distance_degrees).contains(center_point)]
+            # Add a new column 'distance_to_reference_point' to the GeoDataFrame
+            filtered_entries['distance_to_reference_point'] = filtered_entries.apply(lambda row: calculate_distance_h(coordinates[0], coordinates[1], float(row['lon']), float(row['lat'])), axis=1)
+            coverage_response[key] = check(filtered_entries) 
 
     return coverage_response

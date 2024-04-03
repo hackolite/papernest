@@ -1,4 +1,8 @@
-# Swagger generated server
+# MOBILE COVERAGE
+
+Request mobile coverage for a given address
+
+
 
 ## Overview
 
@@ -31,22 +35,6 @@ sudo pip install tox
 tox
 ```
 
-## Running with Docker
-
-To run the server on a Docker container, please execute the following from the root directory:
-
-```bash
-# building the image
-docker build -t swagger_server .
-
-# starting up a container
-docker run -p 8080:8080 swagger_server
-```
-
-
-# MOBILE COVERAGE
-
-Request mobile coverage for a given address 
 
 
 ## Installation
@@ -63,7 +51,25 @@ Install the Endpoint with docker
 ## Documentation
 
 [Api Documentation](http://0.0.0.0:8080/api/v3/ui/#/Network)
+and open your browser to here:
 
+```
+http://localhost:8080/api/v3/ui/
+```
+
+Your Swagger definition lives here:
+
+```
+http://localhost:8080/api/v3/swagger.json
+```
+
+## Tox Tests
+
+To launch the integration tests, use tox:
+```
+sudo pip install tox
+tox
+```
 
 ## Running Tests
 
