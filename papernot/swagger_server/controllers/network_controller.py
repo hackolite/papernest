@@ -99,8 +99,7 @@ def retrieve_coverage(body):  # noqa: E501
         buffer_distance_degrees = buffer_distance_km / 111 
         filtered_entries = gdf[gdf['geometry'].buffer(buffer_distance_degrees).contains(center_point)]
         # Add a new column 'distance_to_reference_point' to the GeoDataFrame
-        filtered_entries['distance_to_reference_point'] = filtered_entries.apply(lambda row: calculate_distance_h(coordinates[0], coordinates[1], \\
-                    float(row['lon']), float(row['lat'])), axis=1)
+        filtered_entries['distance_to_reference_point'] = filtered_entries.apply(lambda row: calculate_distance_h(coordinates[0], coordinates[1], float(row['lon']), float(row['lat'])), axis=1)
         print(filtered_entries.info())
         coverage_response[key] = check(filtered_entries) 
 
